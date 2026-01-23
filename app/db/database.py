@@ -5,7 +5,6 @@ import socket
 
 from app.core.config import SQLALCHEMY_DATABASE_URL
 
-# Force IPv4 for Vercel compatibility
 def patched_getaddrinfo(host, port, *args, **kwargs):
     return socket.getaddrinfo(host, port, socket.AF_INET, *args[1:], **kwargs)
 

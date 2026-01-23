@@ -1,4 +1,5 @@
-from fastapi import APIRouter, Depends, HTTPException, Response
+from fastapi import APIRouter, Depends, HTTPException
+from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 
 from app.core.security import (
@@ -8,7 +9,7 @@ from app.core.security import (
 )
 from app.db.database import get_db
 from app.models.user import UserDB
-from app.schemas.user import UserCreate
+from app.schemas.user import UserCreate, Token
 
 router = APIRouter(
     prefix="/api",
@@ -36,35 +37,31 @@ def register(
     return {"message": "User created successfully", "user_id": user.id}
 
 
-@router.post("/login")
+@router.post("/login", response_model=Token)
 def login(
-    data: UserCreate,
-    response: Response,
+    form_data: OAuth2PasswordRequestForm = Depends(),
     db: Session = Depends(get_db),
 ):
     user = (
         db.query(UserDB)
-        .filter(UserDB.username == data.username)
+        .filter(UserDB.username == form_data.username)
         .first()
     )
 
     if not user or not verify_password(
-        data.password,
+        form_data.password,
         user.hashed_password,
     ):
         raise HTTPException(status_code=401, detail="Invalid credentials")
 
     token = create_access_token({"sub": user.username})
-    response.set_cookie(
-        key="access_token",
-        value=token,
-        httponly=True,
-    )
-
-    return {"message": "Logged in successfully"}
+    
+    return {
+        "access_token": token,
+        "token_type": "bearer"
+    }
 
 
 @router.post("/logout")
-def logout(response: Response):
-    response.delete_cookie("access_token")
+def logout():
     return {"message": "Logged out successfully"}

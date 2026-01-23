@@ -30,10 +30,8 @@ def root():
 
 @app.on_event("startup")
 def startup_event():
-    # Only create tables in development, not on Vercel
     try:
         Base.metadata.create_all(bind=engine)
     except Exception as e:
         print(f"Database initialization warning: {e}")
-        # Don't crash the app if DB creation fails
         pass
