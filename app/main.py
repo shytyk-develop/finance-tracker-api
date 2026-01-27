@@ -1,9 +1,14 @@
-from fastapi import FastAPI
+import logging
+from fastapi import FastAPI, Request
+from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.core.config import API_TITLE, API_DESCRIPTION, API_VERSION
 from app.db.database import Base, engine
 from app.routes import auth, expenses
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 app = FastAPI(
     title=API_TITLE,
@@ -19,19 +24,26 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+@app.exception_handler(Exception)
+async def global_exception_handler(request: Request, exc: Exception):
+    logger.error(f"Unexpected error occurred: {exc}", exc_info=True)
+    
+    return JSONResponse(
+        status_code=500,
+        content={"detail": "An unexpected error occurred. Please try again later."},
+    )
+
 app.include_router(auth.router)
 app.include_router(expenses.router)
-
 
 @app.get("/")
 def root():
     return {"message": "Welcome to Expense Tracker API"}
 
-
 @app.on_event("startup")
 def startup_event():
     try:
         Base.metadata.create_all(bind=engine)
+        logger.info("Database tables created successfully.") 
     except Exception as e:
-        print(f"Database initialization warning: {e}")
-        pass
+        logger.error(f"Database initialization failed: {e}")
