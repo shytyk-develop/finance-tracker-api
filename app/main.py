@@ -2,10 +2,13 @@ import logging
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
+from slowapi import _rate_limit_exceeded_handler
+from slowapi.errors import RateLimitExceeded
 
 from app.core.config import API_TITLE, API_DESCRIPTION, API_VERSION
 from app.db.database import Base, engine
 from app.routes import auth, expenses
+from app.core.limiter import limiter 
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -15,6 +18,9 @@ app = FastAPI(
     description=API_DESCRIPTION,
     version=API_VERSION,
 )
+
+app.state.limiter = limiter
+app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
 app.add_middleware(
     CORSMiddleware,
@@ -37,7 +43,8 @@ app.include_router(auth.router)
 app.include_router(expenses.router)
 
 @app.get("/")
-def root():
+@limiter.limit("10/minute")
+def root(request: Request):
     return {"message": "Welcome to Expense Tracker API"}
 
 @app.on_event("startup")

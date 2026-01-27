@@ -1,6 +1,6 @@
 from typing import List
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Request
 from sqlalchemy.orm import Session
 
 from app.core.security import get_current_user
@@ -8,6 +8,7 @@ from app.db.database import get_db
 from app.models.expense import ExpenseDB
 from app.models.user import UserDB
 from app.schemas.expense import CreateExpense, UpdateExpense, ExpenseResponse
+from app.core.limiter import limiter
 
 router = APIRouter(
     prefix="/api",
@@ -16,7 +17,9 @@ router = APIRouter(
 
 
 @router.post("/create", response_model=ExpenseResponse)
+@limiter.limit("10/minute")
 def create_expense(
+    request: Request,
     data: CreateExpense,
     username: str = Depends(get_current_user),
     db: Session = Depends(get_db),
@@ -45,7 +48,9 @@ def create_expense(
 
 
 @router.get("/get", response_model=List[ExpenseResponse])
+@limiter.limit("10/minute")
 def get_expenses(
+    request: Request,
     username: str = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
@@ -66,7 +71,9 @@ def get_expenses(
 
 
 @router.delete("/delete/{expense_id}")
+@limiter.limit("10/minute")
 def delete_expense(
+    request: Request,
     expense_id: int,
     username: str = Depends(get_current_user),
     db: Session = Depends(get_db),
@@ -102,7 +109,9 @@ def delete_expense(
 
 
 @router.put("/update/{expense_id}", response_model=ExpenseResponse)
+@limiter.limit("10/minute")
 def update_expense(
+    request: Request,
     expense_id: int,
     data: UpdateExpense,
     username: str = Depends(get_current_user),
