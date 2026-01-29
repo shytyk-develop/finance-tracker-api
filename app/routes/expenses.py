@@ -1,6 +1,7 @@
-from typing import List
+from typing import List, Optional
+from datetime import datetime
 
-from fastapi import APIRouter, Depends, HTTPException, Request
+from fastapi import APIRouter, Depends, HTTPException, Request, Query
 from sqlalchemy.orm import Session
 
 from app.core.security import get_current_user
@@ -51,9 +52,17 @@ def create_expense(
 @limiter.limit("10/minute")
 def get_expenses(
     request: Request,
+    limit: int = Query(10, ge=1, le=100, description="Number of records"),
+    offset: int = Query(0, ge=0, description="Offset"),
+    category: Optional[str] = Query(None, description="Filter by category"),
+    start_date: Optional[datetime] = Query(None, description="Start date (YYYY-MM-DD)"),
+    end_date: Optional[datetime] = Query(None, description="End date (YYYY-MM-DD)"),
+    min_amount: Optional[int] = Query(None, ge=0, description="Minimum amount"),
+    max_amount: Optional[int] = Query(None, ge=0, description="Maximum amount"),
     username: str = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
+    
     user = (
         db.query(UserDB)
         .filter(UserDB.username == username)
@@ -63,11 +72,20 @@ def get_expenses(
     if not user:
         return []
 
-    return (
-        db.query(ExpenseDB)
-        .filter(ExpenseDB.owner_id == user.id)
-        .all()
-    )
+    query = db.query(ExpenseDB).filter(ExpenseDB.owner_id == user.id)
+
+    if category:
+        query = query.filter(ExpenseDB.category == category)
+    if start_date:
+        query = query.filter(ExpenseDB.created_at >= start_date)
+    if end_date:
+        query = query.filter(ExpenseDB.created_at <= end_date)
+    if min_amount is not None:
+        query = query.filter(ExpenseDB.amount >= min_amount)
+    if max_amount is not None:
+        query = query.filter(ExpenseDB.amount <= max_amount)
+
+    return query.order_by(ExpenseDB.created_at.desc()).offset(offset).limit(limit).all()
 
 
 @router.delete("/delete/{expense_id}")
