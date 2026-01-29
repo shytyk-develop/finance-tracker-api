@@ -28,3 +28,8 @@ class ExpenseResponse(BaseModel):
 
     class Config:
         from_attributes = True
+
+
+class BalanceResponse(BaseModel):
+    """Schema for balance response."""
+    total_balance: int

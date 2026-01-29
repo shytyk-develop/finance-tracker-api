@@ -3,12 +3,13 @@ from datetime import datetime
 
 from fastapi import APIRouter, Depends, HTTPException, Request, Query
 from sqlalchemy.orm import Session
+from sqlalchemy import func
 
 from app.core.security import get_current_user
 from app.db.database import get_db
 from app.models.expense import ExpenseDB
 from app.models.user import UserDB
-from app.schemas.expense import CreateExpense, UpdateExpense, ExpenseResponse
+from app.schemas.expense import CreateExpense, UpdateExpense, ExpenseResponse, BalanceResponse
 from app.core.limiter import limiter
 
 router = APIRouter(
@@ -170,3 +171,24 @@ def update_expense(
     db.refresh(expense)
 
     return expense
+
+
+@router.get("/get_balance", response_model=BalanceResponse)
+@limiter.limit("10/minute")
+def get_balance(
+    request: Request,
+    username: str = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    user = (
+        db.query(UserDB)
+        .filter(UserDB.username == username)
+        .first()
+    )
+
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    total_balance = db.query(func.sum(ExpenseDB.amount)).filter(ExpenseDB.owner_id == user.id).scalar() or 0
+
+    return {"total_balance": total_balance}
