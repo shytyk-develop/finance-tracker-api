@@ -7,7 +7,7 @@ from slowapi.errors import RateLimitExceeded
 
 from app.core.config import API_TITLE, API_DESCRIPTION, API_VERSION
 from app.db.database import Base, engine
-from app.routes import auth, expenses
+from app.routes import auth, transactions
 from app.core.limiter import limiter 
 
 logging.basicConfig(level=logging.INFO)
@@ -24,11 +24,7 @@ app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "https://income-tracker-frontend-five.vercel.app",   
-        "http://localhost:3000",                            
-        "http://127.0.0.1:3000",
-    ],
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -44,7 +40,7 @@ async def global_exception_handler(request: Request, exc: Exception):
     )
 
 app.include_router(auth.router)
-app.include_router(expenses.router)
+app.include_router(transactions.router)
 
 @app.get("/")
 @limiter.limit("10/minute")

@@ -8,20 +8,26 @@ from app.core.config import SQLALCHEMY_DATABASE_URL
 def patched_getaddrinfo(host, port, *args, **kwargs):
     return socket.getaddrinfo(host, port, socket.AF_INET, *args[1:], **kwargs)
 
-socket.getaddrinfo = patched_getaddrinfo
+if SQLALCHEMY_DATABASE_URL.startswith("sqlite"):
+    engine = create_engine(
+        SQLALCHEMY_DATABASE_URL,
+        connect_args={"check_same_thread": False},
+        echo=False,
+    )
+else:
+    socket.getaddrinfo = patched_getaddrinfo
 
-# Supabase-specific connection configuration
-engine = create_engine(
-    SQLALCHEMY_DATABASE_URL,
-    connect_args={
-        "sslmode": "require",
-        "connect_timeout": 10,
-    },
-    echo=False,
-    pool_pre_ping=True,
-    pool_size=5,
-    max_overflow=0,
-)
+    engine = create_engine(
+        SQLALCHEMY_DATABASE_URL,
+        connect_args={
+            "sslmode": "require",
+            "connect_timeout": 10,
+        },
+        echo=False,
+        pool_pre_ping=True,
+        pool_size=5,
+        max_overflow=0,
+    )
 
 SessionLocal = sessionmaker(
     autocommit=False,
