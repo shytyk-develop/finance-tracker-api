@@ -1,126 +1,106 @@
-# Expense Tracker API
+# Finance Tracker API
 
-> A modern, RESTful API service for personal expense management built with FastAPI and PostgreSQL
+A FastAPI-based application for personal financial management. Track income and expenses, calculate balances, and manage transactions with JWT authentication and PostgreSQL.
 
-![FastAPI](https://img.shields.io/badge/FastAPI-0.104.1-009688?style=flat-square&logo=fastapi)
-![Python](https://img.shields.io/badge/Python-3.9+-3776ab?style=flat-square&logo=python)
-![PostgreSQL](https://img.shields.io/badge/PostgreSQL-Latest-336791?style=flat-square&logo=postgresql)
-![License](https://img.shields.io/badge/License-MIT-green?style=flat-square)
+![FastAPI](https://img.shields.io/badge/FastAPI-0.104.1-green) ![Python](https://img.shields.io/badge/Python-3.9+-blue) ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-13+-blue) ![License](https://img.shields.io/badge/License-MIT-yellow)
 
 ## 📋 Table of Contents
 
-- [Overview](#overview)
-- [Features](#features)
-- [Tech Stack](#tech-stack)
-- [Architecture](#architecture)
-- [Prerequisites](#prerequisites)
-- [Installation](#installation)
-- [Configuration](#configuration)
-- [Running the Application](#running-the-application)
-- [API Documentation](#api-documentation)
-- [API Endpoints](#api-endpoints)
-- [Usage Examples](#usage-examples)
-- [Project Structure](#project-structure)
-- [Contributing](#contributing)
-- [License](#license)
+- [Overview](#-overview)
+- [Features](#-features)
+- [Tech Stack](#-tech-stack)
+- [Architecture](#-architecture)
+- [Installation & Setup](#-installation--setup)
+- [Configuration](#-configuration)
+- [API Endpoints](#-api-endpoints)
+- [Usage Examples](#-usage-examples)
+- [Database Schema](#-database-schema)
+- [Security](#-security)
+- [Rate Limiting](#-rate-limiting)
+- [Error Handling](#-error-handling)
+- [Testing](#-testing)
+- [Deployment](#-deployment)
 
-## Overview
 
-**Expense Tracker API** is a robust, production-ready backend service designed for tracking and managing personal expenses. Built with modern Python frameworks and best practices, it provides secure user authentication, comprehensive expense management capabilities, and RESTful endpoints for seamless integration with frontend applications.
+## 🌟 Overview
 
-The API is designed to be scalable, maintainable, and easy to deploy on cloud platforms such as Vercel, Heroku, or AWS.
+The Finance Tracker API is a robust, secure FastAPI application designed for personal financial management. It allows users to track income and expenses, calculate real-time balances, and perform advanced queries on transactions. Built with modern Python tools and PostgreSQL, it ensures data security through JWT authentication and user isolation.
 
-### Key Use Cases
+Key benefits:
+- **Easy Tracking**: Log income and expenses with categories and descriptions.
+- **Smart Calculations**: Automatic balance computation using database aggregations.
+- **Flexible Queries**: Filter transactions by date, amount, category, or type.
+- **Secure Access**: JWT tokens for authentication, with rate limiting to prevent abuse.
+- **Developer-Friendly**: Auto-generated OpenAPI docs and comprehensive error handling.
 
-- Personal budget management
-- Expense categorization and reporting
-- Multi-user expense tracking
-- Real-time expense monitoring
-- Integration with mobile and web applications
+## 🚀 Features
 
-## Features
+- **Authentication**:
+  - JWT-based authentication with bearer tokens
+  - User registration and secure login/logout
+  - Password hashing with Argon2
 
-### 🔐 Authentication & Security
-- User registration and login with secure password hashing (Argon2)
-- JWT (JSON Web Token) based authentication
-- Configurable token expiration (default: 30 minutes)
-- Password verification using industry-standard algorithms
-- Protected endpoints with token validation
+- **Transaction Management**:
+  - CRUD operations for income/expense transactions
+  - Support for categories, descriptions, and amounts
+  - Validation to ensure positive amounts and valid data
 
-### 💰 Expense Management
-- Create, read, update, and delete expenses
-- Categorize expenses for better organization
-- Add descriptions to track expense details
-- Automatic timestamp tracking (creation dates)
-- User-specific expense isolation (each user sees only their expenses)
-- Pagination and filtering capabilities
+- **Balance & Analytics**:
+  - Real-time balance calculation using SQL aggregations
+  - Separate totals for income and expenses
 
-### 🛡️ Data Integrity
-- Relational database design with foreign keys
-- ACID compliance through SQLAlchemy ORM
-- Unique username constraints
-- Input validation using Pydantic schemas
-- Error handling with descriptive HTTP status codes
+- **Querying & Filtering**:
+  - Advanced filtering by category, type, date range, and amount range
+  - Pagination for large datasets
+  - Sorting and offset support
 
-### 🌐 API Standards
-- RESTful architecture following HTTP conventions
-- CORS (Cross-Origin Resource Sharing) enabled
-- Automatic OpenAPI/Swagger documentation
-- JSON request/response format
-- Comprehensive error messages
+- **Security & Performance**:
+  - Rate limiting to prevent abuse (3-5 req/min)
+  - Pydantic validation for all inputs
+  - Data isolation per user
+  - Auto-generated API docs at `/docs` and `/redoc`
 
-### 📚 Developer Experience
-- Auto-generated API documentation at `/docs` (Swagger UI)
-- Alternative documentation at `/redoc` (ReDoc)
-- Clear endpoint descriptions and request/response examples
-- Type hints throughout codebase for IDE support
+## 🛠 Tech Stack
 
-## Tech Stack
+| Component          | Technology                  | Purpose                          |
+|--------------------|-----------------------------|----------------------------------|
+| **Backend**       | FastAPI 0.104.1            | High-performance web framework with async support |
+| **ORM**           | SQLAlchemy 2.0.23          | Database abstraction and query building |
+| **Database**      | PostgreSQL 13+             | Relational database with ACID compliance |
+| **Authentication**| python-jose 3.3.0          | JWT token creation and validation |
+| **Password Hashing**| argon2-cffi 23.1.0       | Secure password hashing |
+| **Validation**    | Pydantic 2.5.0             | Data validation and serialization |
+| **Rate Limiting** | SlowAPI 0.1.9              | API rate limiting with Redis support |
+| **Server**        | Uvicorn 0.24.0             | ASGI server for production deployment |
 
-### Backend Framework
-- **FastAPI** (0.104.1) - Modern, fast web framework for building APIs with Python
-  - Automatic API documentation generation
-  - Built-in data validation using Pydantic
-  - Dependency injection system
-  - High performance (near equivalent to Node.js and Go)
+## 🏗 Architecture
 
-### Database
-- **PostgreSQL** - Reliable, open-source relational database
-  - ACID compliance
-  - Advanced query capabilities
-  - Excellent for production environments
-- **SQLAlchemy** (2.0.23) - Python ORM for database operations
-  - Object-relational mapping
-  - Query builder
-  - Migration support ready
+The application follows a layered architecture for maintainability:
 
-### Authentication & Security
-- **python-jose** (3.3.0) - JWT token handling
-- **cryptography** (41.0.7) - Cryptographic recipes and primitives
-- **argon2-cffi** (23.1.0) - Password hashing algorithm
-  - Memory-hard hash function
-  - Resistant to GPU cracking attacks
-  - Industry-recommended for password storage
-
-### Data Validation
-- **Pydantic** (2.5.0) - Data validation library
-  - Runtime type checking
-  - JSON serialization/deserialization
-  - Schema validation
-
-### Server & Deployment
-- **Uvicorn** (0.24.0) - ASGI web server
-  - Production-ready
-  - Supports async/await
-- **Vercel** configuration included for serverless deployment
-
-### Development Dependencies
-- **python-dotenv** (1.0.0) - Environment variable management
-- **psycopg2-binary** (2.9.9) - PostgreSQL adapter for Python
-
-## Architecture
-
-### High-Level Architecture
+```
+finance-tracker-api/
+├── app/
+│   ├── core/               # Core utilities
+│   │   ├── config.py       # App settings and env vars
+│   │   ├── security.py     # JWT and password functions
+│   │   └── limiter.py      # Rate limiting config
+│   ├── db/                 # Database layer
+│   │   └── database.py     # SQLAlchemy engine and session
+│   ├── models/             # Data models
+│   │   ├── user.py         # UserDB model
+│   │   └── expense.py      # TransactionDB model
+│   ├── routes/             # API endpoints
+│   │   ├── auth.py         # Auth routes
+│   │   └── transactions.py # Transaction CRUD
+│   ├── schemas/            # Pydantic models
+│   │   ├── user.py         # Auth schemas
+│   │   └── expense.py      # Transaction schemas
+│   └── main.py             # FastAPI app setup
+├── requirements.txt
+├── run.py
+├── init_db.py
+└── README.md
+```
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
@@ -147,567 +127,242 @@ The API is designed to be scalable, maintainable, and easy to deploy on cloud pl
                   ↓
 ┌─────────────────────────────────────────────────────────────┐
 │                  SQLALCHEMY ORM LAYER                       │
-│              (Models: User, Expense)                        │
+│              (Models: User, Transaction)                    │
 └─────────────────┬───────────────────────────────────────────┘
                   │
                   ↓
 ┌─────────────────────────────────────────────────────────────┐
 │              POSTGRESQL DATABASE                            │
-│        ┌──────────────┬──────────────────┐                  │
-│        │ users table  │ expenses table   │                  │
-│        └──────────────┴──────────────────┘                  │
+│        ┌──────────────┬────────────────────┐                │
+│        │ users table  │ transactions table │                │
+│        └──────────────┴────────────────────┘                │
 └─────────────────────────────────────────────────────────────┘
 ```
 
-### Layered Architecture
+### Key Components
+- **Core Layer**: Handles configuration, security, and utilities.
+- **DB Layer**: Manages database connections and sessions.
+- **Models Layer**: Defines SQLAlchemy tables.
+- **Routes Layer**: Contains API endpoints with business logic.
+- **Schemas Layer**: Validates input/output data.
 
-- **Route Layer** - HTTP endpoints and request/response handling
-- **Security Layer** - Authentication, authorization, password hashing
-- **Schema Layer** - Data validation and transformation (Pydantic)
-- **Model Layer** - Database table definitions and relationships
-- **Database Layer** - Connection pooling, session management
-- **Configuration Layer** - Environment variables and app settings
+## 📦 Installation & Setup
 
-## Prerequisites
+### Prerequisites
+- Python 3.9+
+- PostgreSQL 13+ or Supabase
 
-Before running this project, ensure you have:
+### Setup
+1. Clone and enter directory
+2. Create venv: `python -m venv venv && source venv/bin/activate`
+3. Install: `pip install -r requirements.txt`
+4. Create `.env`:
+   ```
+   SECRET_KEY=your-32-char-key
+   DATABASE_URL=postgresql://user:pass@host/db
+   ```
+5. Init DB: `python init_db.py`
+6. Run: `python run.py`
 
-- **Python 3.9+** installed
-- **PostgreSQL 12+** database instance
-- **pip** (Python package manager)
-- **Git** for version control
+Access at http://127.0.0.1:8000/docs
 
-### For Local Development
-- Virtual environment (venv or conda)
-- `.env` file with required environment variables
+## ⚙ Configuration
 
-### For Deployment
-- Vercel account (for serverless deployment)
-- Environment variables configured in deployment platform
+Key environment variables:
+- `SECRET_KEY`: JWT key (32+ chars)
+- `DATABASE_URL`: PostgreSQL connection
+- `REDIS_URL`: Optional for rate limiting
 
-## Installation
+## 📡 API Endpoints
 
-### 1. Clone the Repository
+| Method | Endpoint | Description | Auth |
+|--------|----------|-------------|------|
+| POST | `/api/auth/login` | Login | No |
+| POST | `/api/auth/logout` | Logout | Yes |
+| POST | `/api/create_expense` | Create expense | Yes |
+| POST | `/api/create_income` | Create income | Yes |
+| GET | `/api/get` | List transactions (with filters) | Yes |
+| PUT | `/api/update/{id}` | Update transaction | Yes |
+| DELETE | `/api/delete/{id}` | Delete transaction | Yes |
+| GET | `/api/get_balance` | Get balance | Yes |
 
+## 💡 Usage Examples
+
+### Register
 ```bash
-git clone https://github.com/shytyk-develop/finance-tracker-api
-cd fast-api-n1
-```
-
-### 2. Create Virtual Environment
-
-```bash
-# Using venv
-python -m venv venv
-
-# Activate virtual environment
-# On macOS/Linux:
-source venv/bin/activate
-
-# On Windows:
-venv\Scripts\activate
-```
-
-### 3. Install Dependencies
-
-```bash
-pip install -r requirements.txt
-```
-
-## Configuration
-
-### Environment Variables
-
-Create a `.env` file in the project root with the following variables:
-
-```env
-# Security
-SECRET_KEY=your_secret_key_here
-
-# Database
-DATABASE_URL=postgresql://username:password@hostname:6543/database_name
-
-# API Configuration (optional, has defaults)
-API_TITLE=Expense Tracker API
-API_DESCRIPTION=An API for tracking personal expenses
-API_VERSION=1.0.0
-```
-
-### Database Connection String Format
-
-```
-postgresql://[user]:[password]@[hostname]:[port]/[database]
-```
-
-**Example with Supabase (PostgreSQL hosting service):**
-```
-postgresql://postgres:your_password@db.xxxxxxxxxxxx.supabase.co:6543/postgres
-```
-
-## Running the Application
-
-### Development Mode
-
-```bash
-# Using run.py
-python run.py
-
-# Using uvicorn directly
-uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
-```
-
-The API will be available at `http://localhost:8000`
-
-### Production Mode
-
-```bash
-# Using uvicorn without reload
-uvicorn app.main:app --host 0.0.0.0 --port 8000 --workers 4
-```
-
-### Initialize Database Tables
-
-```bash
-python init_db.py
-```
-
-This creates all database tables defined in the models.
-
-## API Documentation
-
-### Interactive Documentation
-
-Once the server is running, access the interactive API documentation:
-
-- **Swagger UI**: http://localhost:8000/docs
-- **ReDoc**: http://localhost:8000/redoc
-
-These interfaces allow you to:
-- View all available endpoints
-- Read detailed descriptions of each endpoint
-- Test endpoints directly from the browser
-- See request/response schemas
-- Understand required parameters
-
-## API Endpoints
-
-### Authentication Endpoints
-
-#### Register a New User
-
-```http
-POST /api/register
-Content-Type: application/json
-
-{
-  "username": "john_doe",
-  "password": "secure_password_123"
-}
-```
-
-**Response (201 Created):**
-```json
-{
-  "message": "User created successfully",
-  "user_id": 1
-}
-```
-
-**Error Response (400 Bad Request):**
-```json
-{
-  "detail": "User already exists"
-}
-```
-
----
-
-#### Login (Obtain Access Token)
-
-```http
-POST /api/login
-Content-Type: application/json
-
-{
-  "username": "john_doe",
-  "password": "secure_password_123"
-}
-```
-
-**Response (200 OK):**
-```json
-{
-  "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
-  "token_type": "bearer",
-  "expires_in": 1800
-}
-```
-
----
-
-### Expense Endpoints
-
-All expense endpoints require authentication. Include the JWT token in the Authorization header:
-
-```
-Authorization: Bearer {access_token}
-```
-
-#### Create Expense
-
-```http
-POST /api/create
-Content-Type: application/json
-Authorization: Bearer {token}
-
-{
-  "amount": 2500,
-  "category": "Food",
-  "description": "Lunch with team members"
-}
-```
-
-**Response (200 OK):**
-```json
-{
-  "id": 1,
-  "amount": 2500,
-  "category": "Food",
-  "description": "Lunch with team members",
-  "created_at": "2026-01-21T10:30:00",
-  "owner_id": 1
-}
-```
-
----
-
-#### Get All User Expenses
-
-```http
-GET /api/expenses
-Authorization: Bearer {token}
-```
-
-**Response (200 OK):**
-```json
-[
-  {
-    "id": 1,
-    "amount": 2500,
-    "category": "Food",
-    "description": "Lunch with team members",
-    "created_at": "2026-01-21T10:30:00",
-    "owner_id": 1
-  },
-  {
-    "id": 2,
-    "amount": 5000,
-    "category": "Transport",
-    "description": "Taxi to office",
-    "created_at": "2026-01-21T11:00:00",
-    "owner_id": 1
-  }
-]
-```
-
----
-
-#### Update Expense
-
-```http
-PUT /api/expenses/{id}
-Content-Type: application/json
-Authorization: Bearer {token}
-
-{
-  "amount": 3000,
-  "category": "Food",
-  "description": "Updated lunch expense"
-}
-```
-
----
-
-#### Delete Expense
-
-```http
-DELETE /api/expenses/{id}
-Authorization: Bearer {token}
-```
-
-**Response (200 OK):**
-```json
-{
-  "message": "Expense deleted successfully"
-}
-```
-
----
-
-## Usage Examples
-
-### Complete Workflow
-
-#### Step 1: Register a New User
-
-```bash
-curl -X POST "http://localhost:8000/api/register" \
+curl -X POST "http://127.0.0.1:8000/api/register" \
   -H "Content-Type: application/json" \
-  -d '{
-    "username": "alice",
-    "password": "SecurePassword123!"
-  }'
+  -d '{"username": "newuser", "password": "securepass123"}'
+# Response: {"message": "User created successfully", "user_id": 1}
 ```
 
-#### Step 2: Login to Get Access Token
-
+### Login
 ```bash
-curl -X POST "http://localhost:8000/api/login" \
+curl -X POST "http://127.0.0.1:8000/api/auth/login" \
+  -H "Content-Type: application/x-www-form-urlencoded" \
+  -d 'username=user&password=pass'
+# Response: {"access_token": "eyJ...", "token_type": "bearer"}
+```
+
+### Create Income
+```bash
+curl -X POST "http://127.0.0.1:8000/api/create_income" \
+  -H "Authorization: Bearer YOUR_TOKEN" \
   -H "Content-Type: application/json" \
-  -d '{
-    "username": "alice",
-    "password": "SecurePassword123!"
-  }'
+  -d '{"amount": 5000, "category": "Salary", "description": "Monthly pay"}'
 ```
 
-Save the `access_token` from the response.
-
-#### Step 3: Create an Expense
-
+### Update Transaction
 ```bash
-curl -X POST "http://localhost:8000/api/create" \
-  -H "Authorization: Bearer YOUR_ACCESS_TOKEN" \
+curl -X PUT "http://127.0.0.1:8000/api/update/1" \
+  -H "Authorization: Bearer YOUR_TOKEN" \
   -H "Content-Type: application/json" \
-  -d '{
-    "amount": 1500,
-    "category": "Groceries",
-    "description": "Weekly shopping"
-  }'
+  -d '{"amount": 1200, "category": "Food"}'
 ```
 
-#### Step 4: Retrieve All Expenses
-
+### Delete Transaction
 ```bash
-curl -X GET "http://localhost:8000/api/expenses" \
-  -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
+curl -X DELETE "http://127.0.0.1:8000/api/delete/1" \
+  -H "Authorization: Bearer YOUR_TOKEN"
+# Response: {"message": "Transaction deleted"}
 ```
 
-#### Step 5: Update an Expense
+### Python Client
+```python
+import requests
 
-```bash
-curl -X PUT "http://localhost:8000/api/expenses/1" \
-  -H "Authorization: Bearer YOUR_ACCESS_TOKEN" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "amount": 1600,
-    "category": "Groceries",
-    "description": "Weekly shopping - updated price"
-  }'
+BASE_URL = "http://127.0.0.1:8000"
+TOKEN = "your_jwt_token"
+
+headers = {"Authorization": f"Bearer {TOKEN}"}
+
+# Create expense
+response = requests.post(f"{BASE_URL}/api/create_expense", 
+                         json={"amount": 100, "category": "Misc"}, 
+                         headers=headers)
+print(response.json())
+
+# Get balance
+balance = requests.get(f"{BASE_URL}/api/get_balance", headers=headers).json()
+print(f"Balance: {balance['current_balance']}")
 ```
 
-#### Step 6: Delete an Expense
+## 🗄 Database Schema
 
-```bash
-curl -X DELETE "http://localhost:8000/api/expenses/1" \
-  -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
+### Tables
+
+#### users
+| Column          | Type          | Constraints              | Description |
+|-----------------|---------------|--------------------------|-------------|
+| id             | INTEGER      | PRIMARY KEY, AUTO_INCREMENT | Unique user ID |
+| username       | VARCHAR      | UNIQUE, NOT NULL        | User login name |
+| hashed_password| VARCHAR      | NOT NULL                | Argon2 hashed password |
+| created_at     | TIMESTAMP    | DEFAULT CURRENT_TIMESTAMP| Account creation time |
+
+#### transactions
+| Column      | Type          | Constraints              | Description |
+|-------------|---------------|--------------------------|-------------|
+| id         | INTEGER      | PRIMARY KEY, AUTO_INCREMENT | Unique transaction ID |
+| amount     | INTEGER      | NOT NULL, CHECK > 0     | Transaction amount (cents) |
+| category   | VARCHAR      | NOT NULL, MAX 40 chars  | Category (e.g., "Food") |
+| description| VARCHAR      | NULL, MAX 100 chars     | Optional description |
+| type       | ENUM         | NOT NULL, DEFAULT 'expense' | 'income' or 'expense' |
+| created_at | TIMESTAMP    | DEFAULT CURRENT_TIMESTAMP| Transaction timestamp |
+| owner_id   | INTEGER      | FOREIGN KEY → users.id  | Owner user ID |
+
+### Relationships
+- One-to-Many: users → transactions
+
+### Sample Data
+```sql
+INSERT INTO users (username, hashed_password) VALUES ('user1', 'hashed_pass');
+INSERT INTO transactions (amount, category, type, owner_id) VALUES
+(5000, 'Salary', 'income', 1),
+(1000, 'Groceries', 'expense', 1);
 ```
 
-## Project Structure
+## 🔒 Security
 
+- JWT tokens for authentication
+- Argon2 password hashing
+- Input validation with Pydantic
+- Data isolation by user ID
+
+## 🛡️ Rate Limiting
+
+Limits applied per endpoint:
+- Auth endpoints: 3/min
+- Create transactions: 5/min
+- Other endpoints: 10/min
+
+## 🚨 Error Handling
+
+Common status codes:
+- 200: Success
+- 401: Unauthorized
+- 404: Not found
+- 422: Validation error
+- 429: Rate limit exceeded
+- 500: Internal error
+
+## 🧪 Testing
+
+Run tests with `pytest`.
+
+### Example Test
+```python
+from fastapi.testclient import TestClient
+from app.main import app
+
+client = TestClient(app)
+
+def test_create_transaction():
+    # Assume login first
+    response = client.post("/api/create_expense", 
+                           json={"amount": 100, "category": "Test"},
+                           headers={"Authorization": "Bearer token"})
+    assert response.status_code == 200
 ```
-fast-api-n1/
-├── app/
-│   ├── __init__.py
-│   ├── main.py                    # FastAPI application setup
-│   ├── core/
-│   │   ├── __init__.py
-│   │   ├── config.py              # Configuration and environment variables
-│   │   └── security.py            # Authentication and password hashing
-│   ├── db/
-│   │   ├── __init__.py
-│   │   └── database.py            # Database connection and session management
-│   ├── models/
-│   │   ├── __init__.py
-│   │   ├── user.py                # User database model
-│   │   └── expense.py             # Expense database model
-│   ├── routes/
-│   │   ├── __init__.py
-│   │   ├── auth.py                # Authentication endpoints
-│   │   └── expenses.py            # Expense management endpoints
-│   └── schemas/
-│       ├── __init__.py
-│       ├── user.py                # User data validation schemas
-│       └── expense.py             # Expense data validation schemas
-├── api.py                         # Alternative entry point
-├── run.py                         # Development server runner
-├── init_db.py                     # Database initialization script
-├── requirements.txt               # Python dependencies
-├── vercel.json                    # Vercel deployment configuration
-└── README.md                      # This file
-```
 
+Install pytest: `pip install pytest`
 
-## Database Schema
+## 🚀 Deployment
 
-### Users Table
+### Local
+`python run.py`
 
-| Column | Type | Constraints | Description |
-|--------|------|-------------|-------------|
-| id | Integer | PRIMARY KEY, AUTO INCREMENT | Unique user identifier |
-| username | String | UNIQUE, NOT NULL | User's login name |
-| hashed_password | String | NOT NULL | Argon2 hashed password |
-| created_at | DateTime | DEFAULT CURRENT_TIMESTAMP | Account creation timestamp |
+### Production
+Use Gunicorn/Uvicorn or Docker. Set env vars for secrets.
 
-### Expenses Table
-
-| Column | Type | Constraints | Description |
-|--------|------|-------------|-------------|
-| id | Integer | PRIMARY KEY, AUTO INCREMENT | Unique expense identifier |
-| amount | Integer | NOT NULL | Expense amount (in cents) |
-| category | String | NOT NULL | Expense category |
-| description | String | NULLABLE | Optional expense details |
-| created_at | DateTime | DEFAULT CURRENT_TIMESTAMP | Expense creation timestamp |
-| owner_id | Integer | FOREIGN KEY (users.id) | Reference to expense owner |
-
-## Error Handling
-
-The API implements comprehensive error handling with meaningful HTTP status codes and messages:
-
-| Status Code | Meaning | Example |
-|-------------|---------|---------|
-| 200 | OK | Successful GET, PUT, DELETE request |
-| 201 | Created | Successful resource creation |
-| 400 | Bad Request | Invalid input, validation failed |
-| 401 | Unauthorized | Missing or invalid authentication token |
-| 403 | Forbidden | User attempting unauthorized action |
-| 404 | Not Found | Resource does not exist |
-| 500 | Internal Server Error | Server-side error |
-
-## Security Considerations
-
-1. **Password Security**
-   - Passwords are hashed using Argon2 algorithm
-   - Never stored in plain text
-   - Uses salt to prevent rainbow table attacks
-
-2. **Token Management**
-   - JWT tokens expire after 30 minutes
-   - Tokens are signed with a secret key
-   - Only the server can create and validate tokens
-
-3. **Data Isolation**
-   - Users only see their own expenses
-   - Database enforces foreign key relationships
-   - API enforces authorization checks
-
-4. **Production Recommendations**
-   - Use HTTPS/TLS for all communications
-   - Rotate SECRET_KEY regularly
-   - Store environment variables securely
-   - Use environment-specific configurations
-   - Enable rate limiting for API endpoints
-   - Implement request logging and monitoring
-   - Use a Web Application Firewall (WAF)
-
-## Deployment
-
-### Vercel (Recommended for Serverless)
-
-1. Push your code to GitHub
-2. Connect your GitHub repository to Vercel
-3. Set environment variables in Vercel dashboard:
-   - `SECRET_KEY`
-   - `DATABASE_URL`
-4. Deploy with `vercel deploy`
-
-For detailed Vercel configuration, see `vercel.json`.
-
-### Traditional Hosting (AWS, Heroku, DigitalOcean)
-
-1. Ensure PostgreSQL is running and accessible
-2. Set environment variables on the hosting platform
-3. Run: `pip install -r requirements.txt`
-4. Run: `uvicorn app.main:app --host 0.0.0.0 --port 8000`
-
-## Development Workflow
-
-### Adding a New Endpoint
-
-1. Create a schema in `app/schemas/` (Pydantic model)
-2. Create or update a model in `app/models/` (SQLAlchemy model)
-3. Add the route handler in `app/routes/`
-4. Import and include the router in `app/main.py`
-5. Test using `/docs` endpoint
-
-### Best Practices
-
-- Always validate input using Pydantic schemas
-- Use type hints for better IDE support and documentation
-- Follow RESTful conventions for endpoint naming
-- Keep business logic in route handlers or separate service files
-- Write meaningful error messages for debugging
+### Supabase
+Use Supabase PostgreSQL URL in `DATABASE_URL`.
 
 ## Contributing
 
-We welcome contributions! Here's how to get started:
+1. Fork the repo
+2. Create a feature branch
+3. Make changes
+4. Run tests
+5. Submit a PR
 
-1. Fork the repository
-2. Create a feature branch: `git checkout -b feature/amazing-feature`
-3. Make your changes and commit: `git commit -m 'Add amazing feature'`
-4. Push to the branch: `git push origin feature/amazing-feature`
-5. Open a Pull Request
+## Changelog
 
-### Code Standards
-
-- Follow PEP 8 Python style guide
-- Add type hints to all functions
-- Document complex logic with comments
-- Test your changes before submitting PR
+### v1.0.0
+- Initial release with basic features
 
 ## Troubleshooting
 
-### Database Connection Issues
+- **DB Connection**: Check `DATABASE_URL` and PostgreSQL status
+- **401 Unauthorized**: Verify JWT token in Authorization header
+- **429 Rate Limit**: Wait or check limits
+- **422 Validation**: Check input format
+- **Registration fails**: Username might be taken
 
-```
-Error: could not translate host name "db.xxx.supabase.co" to address
-```
-- Check your DATABASE_URL in `.env`
-- Verify PostgreSQL is running and accessible
-- Check firewall and network settings
-
-### Token Expired
-
-```
-Error: "Could not validate credentials"
-```
-- Obtain a new token by logging in again
-- Check token expiration time in config (default: 30 minutes)
-
-### Port Already in Use
-
-```
-Error: Address already in use
-```
-- Change port: `uvicorn app.main:app --port 8001`
-- Or kill the process using port 8000
-
-## Performance & Scalability
-
-- **Connection Pooling**: SQLAlchemy manages database connection pool
-- **Async Support**: FastAPI supports async endpoints for high concurrency
-- **Caching Ready**: Architecture supports Redis caching integration
-- **Horizontal Scaling**: Stateless design allows running multiple instances
-- **Load Balancing**: Compatible with any load balancer (nginx, HAProxy, etc.)
+Enable `DEBUG=True` for logs.
 
 ## License
 
 This project is licensed under the MIT License - see the LICENSE file for details.
-
-## Support
-
-For issues, questions, or suggestions:
-- Open an issue on GitHub
-- Check existing documentation
 
 ## Author
 
@@ -716,6 +371,5 @@ For issues, questions, or suggestions:
 
 ---
 
-**Last Updated:** January 22, 2026  
+**Last Updated:** January 30, 2026  
 **API Version:** 1.0.0  
-**Status:** Active Development
